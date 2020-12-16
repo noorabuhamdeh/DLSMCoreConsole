@@ -1,0 +1,1 @@
+Gurux.DLMS.Client.Example.Net.exe -S COM4 -c 3 -s 1339 -l 1 -P 00000003 -a Low
