@@ -1,9 +1,11 @@
 ﻿using Gurux.Common;
 using Gurux.DLMS;
 using Gurux.DLMS.Enums;
+using Gurux.DLMS.Objects;
 using Gurux.Serial;
 using System;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 
 namespace DLSMConsoleCore
@@ -18,8 +20,8 @@ namespace DLSMConsoleCore
         static IGXMedia CreateComPortMedia(string portName = null)
         {
 
-            GXSerial gXSerial = new Gurux.Serial.GXSerial();
-            gXSerial.PortName = string.IsNullOrEmpty(portName) ? "COM4" : portName;
+            GXSerial gXSerial = new  GXSerial();
+            gXSerial.PortName = string.IsNullOrEmpty(portName) ? "COM1" : portName;
             gXSerial.BaudRate = 9600;
             gXSerial.DataBits = 8;
             gXSerial.Parity = Parity.None;
@@ -46,34 +48,100 @@ namespace DLSMConsoleCore
             client.Authentication = Authentication.Low;
 
 
+            Media =  CreateComPortMedia("COM4");
+
+            try
+            {
+                Media.Open();
+            }
+            catch (System.IO.IOException ex)
+            {
+                Console.WriteLine("----------------------------------------------------------");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Available ports:");
+                Console.WriteLine(string.Join(" ", GXSerial.GetPortNames()));
+                return;
+            }
+
             GXReplyData reply = new GXReplyData();
             //GXDLMSClient client = new GXDLMSClient();
-
-            byte[] data;
-            data = client.SNRMRequest();
-            if (data != null)
+            try
             {
-                ReadDLMSPacket(data, reply);
-                //Has server accepted client.
-                client.ParseUAResponse(reply.Data);
-                Console.WriteLine("Parsing UA reply succeeded.");
-            }
 
-            //Generate AARQ request.
-            //Split requests to multiple packets if needed. 
-            //If password is used all data might not fit to one packet.
-            foreach (byte[] it in client.AARQRequest())
+                byte[] data;
+                data = client.SNRMRequest();
+                if (data != null)
+                {
+                    ReadDLMSPacket(data, reply);
+                    //Has server accepted client.
+                    client.ParseUAResponse(reply.Data);
+                    Console.WriteLine("Parsing UA reply succeeded.");
+                }
+
+                //Generate AARQ request.
+                //Split requests to multiple packets if needed. 
+                //If password is used all data might not fit to one packet.
+                foreach (byte[] it in client.AARQRequest())
+                {
+                    reply.Clear();
+                    ReadDLMSPacket(it, reply);
+                }
+                //Parse reply.
+                client.ParseAAREResponse(reply.Data);
+                Console.WriteLine("Connection succeeded.");
+
+                Console.WriteLine("starting to read Association Views...");
+
+                /// Read Association View from the meter.
+                reply = new GXReplyData();
+                ReadDataBlock(client.GetObjectsRequest(), reply);
+                GXDLMSObjectCollection objects = client.ParseObjects(reply.Data, true);
+
+                Console.WriteLine($"Recieved: {objects.Count} objects");
+
+
+                Console.WriteLine("now once done, disconnect");
+                reply = new GXReplyData();
+                ReadDLMSPacket(client.DisconnectRequest(), reply);
+                Media.Close();
+            }
+            catch (Exception ex)
             {
-                reply.Clear();
-                ReadDLMSPacket(it, reply);
-            }
-            //Parse reply.
-            client.ParseAAREResponse(reply.Data);
-            Console.WriteLine("Connection succeeded.");
 
+                Console.WriteLine($"Exception: {ex}");
+            }
 
             Console.WriteLine("finished");
             Console.ReadKey();
+        }
+
+        private static void ReadDataBlock(byte[] data, GXReplyData reply)
+        {
+            ReadDLMSPacket(data, reply);
+            lock (Media.Synchronous)
+            {
+                while (reply.IsMoreData)
+                {
+                    if (reply.IsStreaming())
+                    {
+                        data = null;
+                    }
+                    else
+                    {
+                        data = client.ReceiverReady(reply);
+                    }
+                    ReadDLMSPacket(data, reply);
+                        //If data block is read.
+                    if ((reply.MoreData & RequestTypes.Frame) == 0)
+                    {
+                        Console.Write("+");
+                    }
+                    else
+                    {
+                        Console.Write("-");
+                    }
+                }
+            }
         }
         /// <summary>
         /// Read DLMS Data from the device.
