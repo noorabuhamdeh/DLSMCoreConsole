@@ -2,6 +2,7 @@
 using Gurux.DLMS;
 using Gurux.DLMS.Enums;
 using Gurux.DLMS.Objects;
+using Gurux.DLMS.Secure;
 using Gurux.Serial;
 using System;
 using System.IO.Ports;
@@ -12,7 +13,7 @@ namespace DLSMConsoleCore
 {
     class Program
     { 
-        static GXDLMSClient client = new GXDLMSClient();
+        static GXDLMSSecureClient client = new GXDLMSSecureClient(true);
         static IGXMedia Media = null;
         
         private static int WaitTime = 500;
