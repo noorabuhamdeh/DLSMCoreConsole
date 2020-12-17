@@ -44,7 +44,7 @@ namespace DLSMConsoleCore
             // Some manufacturers might use own Server and Client addresses.
 
             client.ClientAddress = 3;
-            client.ServerAddress = 1339;
+            client.ServerAddress = GXDLMSClient.GetServerAddress(int.Parse("1"), 1339); 
             client.Password = Encoding.ASCII.GetBytes("00000003");
             client.Authentication = Authentication.Low;
 
