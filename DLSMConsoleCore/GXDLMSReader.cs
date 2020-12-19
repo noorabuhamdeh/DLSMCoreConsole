@@ -1067,6 +1067,70 @@ namespace DLSMConsoleCore
             }
         }
 
+        public string PrintObject(GXDLMSObject obj)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine();
+            sb.AppendLine("************************");
+            sb.AppendLine($"{obj.GetType().Name} : Logical: [{obj.Name}]");
+            sb.AppendLine($"{ obj.Description}");
+            sb.AppendLine("---------------------------");
+            sb.AppendLine("Contains named Methods:");
+
+            foreach (string name in (obj as IGXDLMSBase).GetMethodNames())
+            {
+                sb.AppendLine(name);
+            }
+
+            sb.AppendLine("---------------------------");
+            sb.AppendLine("Actual Reading:");
+            int counter = 1;
+            foreach (string name in (obj as IGXDLMSBase).GetNames())
+            {
+                try
+                {
+                    if ((obj.GetAccess(counter) & AccessMode.Read) != 0)
+                    {
+                        var dt = (obj as IGXDLMSBase).GetDataType(counter).ToString();
+                        object val = Read(obj, counter);
+                        sb.AppendLine($"\t{name}={val}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    sb.Append("Error! " + obj.GetType().Name + " " + obj.Name + "Index: " + counter + " " + ex.Message);
+                    sb.Append(ex.ToString());
+                }
+                counter++;
+            }
+
+            // // Extract elements table for debugging
+            //sb.AppendLine("---------------------------");
+            //sb.AppendLine("Contains named Elements:");
+            //sb.AppendLine($"Name,Datatype,Indexed,Value");
+            //counter = 1;
+            //foreach(string name in (obj as IGXDLMSBase).GetNames())
+            //{
+            //    try
+            //    {
+            //        if ((obj.GetAccess(counter) & AccessMode.Read) != 0)
+            //        {
+            //            var dt = (obj as IGXDLMSBase).GetDataType(counter).ToString();
+            //            object val = Read(obj, counter);
+            //            sb.AppendLine($"{name},{dt},{counter},{val}");
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        sb.Append("Error! " + obj.GetType().Name + " " + obj.Name + "Index: " + counter + " " + ex.Message);
+            //        sb.Append(ex.ToString());
+            //    }
+            //    counter++;
+            //}
+           
+            sb.AppendLine("************************");
+            return sb.ToString();
+        }
         /// <summary>
         /// Read attribute value.
         /// </summary>

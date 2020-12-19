@@ -37,19 +37,30 @@ namespace DLSMConsoleCore
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
+                .WriteTo.File("Log.txt")
+                .MinimumLevel.Debug()
                 .CreateLogger();
             GXDLMSSecureClient client = new GXDLMSSecureClient(true);
-            IGXMedia media = CreateComPortMedia("COM4");
-            var reader = new DLMSReader(Log.Logger, client, media);
+            IGXMedia media = null;
+            DLMSReader reader = null;
+            string outputFile = "output.xml";
 
             try
             {
+                Log.Logger.Information("Strating...");
+
+                media = CreateComPortMedia("COM4");
+
+                Log.Logger.Information("Connected to port COM4");
+
                 client.UseLogicalNameReferencing = true;
                 client.InterfaceType = InterfaceType.HDLC;
                 client.ClientAddress = 3;
                 client.ServerAddress = GXDLMSClient.GetServerAddress(int.Parse("1"), 1339);
                 client.Password = Encoding.ASCII.GetBytes("00000003");
                 client.Authentication = Authentication.Low;
+
+                reader = new DLMSReader(Log.Logger, client, media);
 
                 try
                 {
@@ -65,50 +76,92 @@ namespace DLSMConsoleCore
                 }
             //Some meters need a break here.
             Thread.Sleep(1000);
-                if (readObjects.Count != 0)
+            Log.Logger.Information("**********  Start reading now ********");
+                var fileName = System.IO.Directory.GetCurrentDirectory() + "\\" + outputFile;
+                
+                if (System.IO.File.Exists(fileName))
                 {
                     bool read = false;
-                    //if (settings.outputFile != null)
-                    //{
-                    //    try
-                    //    {
-                    //        settings.client.Objects.Clear();
-                    //        settings.client.Objects.AddRange(GXDLMSObjectCollection.Load(settings.outputFile));
-                    //        read = true;
-                    //    }
-                    //    catch (Exception)
-                    //    {
-                    //        //It's OK if this fails.
-                    //    }
-                    //}
+                    if (outputFile != null)
+                    {
+                        Log.Logger.Information($"**********  reading from file: {fileName}");
+                        try
+                        {
+                            client.Objects.Clear();
+                            client.Objects.AddRange(GXDLMSObjectCollection.Load(fileName));
+                            read = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            //It's OK if this fails.
+                        }
+                    }
                     reader.InitializeConnection();
 
                     if (!read)
                     {
                         reader.GetAssociationView(null);
                     }
-                    foreach (KeyValuePair<string, int> it in readObjects)
+                    //foreach (KeyValuePair<string, int> it in readObjects)
+                    //{
+                    //    var obj = client.Objects.FindByLN(ObjectType.None, it.Key);
+                    //    Log.Logger.Information($"reading: {obj.ToString()}");
+                    //    object val = reader.Read(client.Objects.FindByLN(ObjectType.None, it.Key), it.Value);
+                    //    //reader.ShowValue(val, it.Value);
+                    //    Log.Logger.Information(val.ToString());
+                    //}
+                    if (outputFile != null)
                     {
-                        object val = reader.Read(client.Objects.FindByLN(ObjectType.None, it.Key), it.Value);
-                        reader.ShowValue(val, it.Value);
+                        try
+                        {
+                           // client.Objects.Save(outputFile, new GXXmlWriterSettings() { UseMeterTime = true, IgnoreDefaultValues = false });
+                        }
+                        catch (Exception)
+                        {
+                            //It's OK if this fails.
+                        }
                     }
-                    //if (settings.outputFile != null)
-                    //{
-                    //    try
-                    //    {
-                    //        settings.client.Objects.Save(settings.outputFile, new GXXmlWriterSettings() { UseMeterTime = true, IgnoreDefaultValues = false });
-                    //    }
-                    //    catch (Exception)
-                    //    {
-                    //        //It's OK if this fails.
-                    //    }
-                    //}
-                    //}
-                    //else
-                    //{
-                    //    reader.ReadAll(settings.outputFile);
-                    //}
                 }
+                else
+                {
+                    Log.Logger.Information("************    Reading All    *********");
+                    reader.ReadAll(outputFile);
+                }
+                Log.Logger.Information("************    Done reading    *********");
+
+
+                do
+                {
+                    try
+                    {
+
+                    Log.Logger.Information("please enter the object [key:index] to read or x to exit");
+                    var objectToRead = Console.ReadLine();
+                    KeyValuePair<string, int> pair = new KeyValuePair<string, int>("", 0);
+                    if (objectToRead == "x")
+                        return;
+
+                    if (objectToRead.Contains(":"))
+                        pair = new KeyValuePair<string, int>(objectToRead.Split(":")[0], int.Parse(objectToRead.Split(":")[1]));
+                    else
+                        pair = new KeyValuePair<string, int>(objectToRead, 1);
+
+                    //object val = reader.Read(client.Objects.FindByLN(ObjectType.None, pair.Key), pair.Value);
+                    var obj = client.Objects.FindByLN(ObjectType.None, pair.Key);
+                    //obj = client.Objects.FindByLN(ObjectType.Clock, "");
+                    var msg = obj.ToString();
+
+                    Log.Logger.Information(reader.PrintObject(obj));
+                   
+                    //object val = reader.Read(obj, pair.Value);
+                    //reader.ShowValue(val, pair.Value);
+                    }
+                    catch (Exception)
+                    {
+                        Log.Logger.Error("invalid input. try again");
+                    }
+
+                } while (true);
             }
             catch (GXDLMSException ex)
             {
@@ -140,5 +193,6 @@ namespace DLSMConsoleCore
             }
             Console.ReadKey();
         }
+        
     }
 }
