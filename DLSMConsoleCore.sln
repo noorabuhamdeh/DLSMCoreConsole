@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gurux.DLMS.Net", "Gurux.DLM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gurux.Serial", "Gurux.Serial\Gurux.Serial.csproj", "{2DAE33AF-EBF1-4887-8333-D8C857B0928E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServer", "WebServer\WebServer.csproj", "{4AD82606-6DFA-4E24-8186-43EB1A233599}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2DAE33AF-EBF1-4887-8333-D8C857B0928E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DAE33AF-EBF1-4887-8333-D8C857B0928E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DAE33AF-EBF1-4887-8333-D8C857B0928E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AD82606-6DFA-4E24-8186-43EB1A233599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AD82606-6DFA-4E24-8186-43EB1A233599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AD82606-6DFA-4E24-8186-43EB1A233599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AD82606-6DFA-4E24-8186-43EB1A233599}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
