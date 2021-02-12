@@ -11,7 +11,7 @@
     <Version Condition=" '$(BUILD_BUILDNUMBER)' == '' ">0.0.1-local</Version>
     <Version Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_BUILDNUMBER)</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <TargetFrameworks>net46;net40;net45;net35;netstandard2.1;netstandard2.0;netcoreapp3.1;netcoreapp2.0;netcoreapp2.1;</TargetFrameworks>
+    <TargetFrameworks>net46;net40;net45;net35;netstandard2.0;netcoreapp3.1;netcoreapp2.0;netcoreapp2.1;</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/gurux/Gurux.Serial</RepositoryUrl>
     <PackageTags>Gurux Device Framework Network Serial port</PackageTags>

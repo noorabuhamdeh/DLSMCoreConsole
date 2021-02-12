@@ -49,9 +49,9 @@ namespace DLSMConsoleCore
             {
                 Log.Logger.Information("Strating...");
 
-                media = CreateComPortMedia("COM4");
+                media = CreateComPortMedia("COM5");
 
-                Log.Logger.Information("Connected to port COM4");
+                Log.Logger.Information("Connected to port COM5");
 
                 client.UseLogicalNameReferencing = true;
                 client.InterfaceType = InterfaceType.HDLC;
@@ -110,17 +110,19 @@ namespace DLSMConsoleCore
                     //    //reader.ShowValue(val, it.Value);
                     //    Log.Logger.Information(val.ToString());
                     //}
-                    if (outputFile != null)
-                    {
-                        try
-                        {
-                           // client.Objects.Save(outputFile, new GXXmlWriterSettings() { UseMeterTime = true, IgnoreDefaultValues = false });
-                        }
-                        catch (Exception)
-                        {
-                            //It's OK if this fails.
-                        }
-                    }
+
+
+                    //if (outputFile != null)
+                    //{
+                    //    try
+                    //    {
+                    //        client.Objects.Save(outputFile, new GXXmlWriterSettings() { UseMeterTime = true, IgnoreDefaultValues = false });
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        //It's OK if this fails.
+                    //    }
+                    //}
                 }
                 else
                 {
@@ -148,11 +150,15 @@ namespace DLSMConsoleCore
 
                     //object val = reader.Read(client.Objects.FindByLN(ObjectType.None, pair.Key), pair.Value);
                     var obj = client.Objects.FindByLN(ObjectType.None, pair.Key);
-                    //obj = client.Objects.FindByLN(ObjectType.Clock, "");
-                    var msg = obj.ToString();
+                        //obj = client.Objects.FindByLN(ObjectType.Clock, "");
+                        if (obj == null)
+                            Log.Logger.Information("not found");
+                        else
+                        {
+                            var msg = obj.ToString();
 
-                    Log.Logger.Information(reader.PrintObject(obj));
-                   
+                            Log.Logger.Information(reader.PrintObject(obj));
+                        }
                     //object val = reader.Read(obj, pair.Value);
                     //reader.ShowValue(val, pair.Value);
                     }
