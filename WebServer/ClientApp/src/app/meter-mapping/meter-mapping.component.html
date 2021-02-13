@@ -1,0 +1,25 @@
+<p *ngIf="!meter"><em>Loading...</em></p>
+
+
+<!-- <div class="btn btn-success" (click)="back()">Back</div> -->
+<div *ngIf="meter" class="btn btn-primary float-right" (click)="createMeterMapping()">Create New Mapping</div>
+
+<h1 *ngIf="meter" id="tableLabel">{{ meter.name}} - {{meter.manufactureName}}</h1>
+<table class='table table-hover' aria-labelledby="tableLabel" *ngIf="meterMappings">
+  <thead>
+    <tr>
+      <th>OBIS Code</th>
+      <th>Mapped To Address</th>
+      <th>Data Type</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let meter of meterMappings">
+      <td>{{ meter.obiS_Code}}</td>
+      <td>{{ meter.mappedToAddress }}</td>
+      <td>{{ meter.dataType }}</td>
+    <td><div (click)="editMeterMapping(meter.id)" class="btn btn-success">Edit</div> </td>
+    </tr>
+  </tbody>
+</table>

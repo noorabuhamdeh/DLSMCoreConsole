@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
@@ -9,6 +9,11 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
+import { MetersComponent } from './meters/meters.component';
+import { CreateMeterComponent } from './create-meter/create-meter.component';
+import { CreateMeterMappingComponent } from './create-meter-mapping/create-meter-mapping.component';
+import { MeterMappingComponent } from './meter-mapping/meter-mapping.component';
+import { EditMeterMappingComponent } from './edit-meter-mapping/edit-meter-mapping.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +21,13 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
     NavMenuComponent,
     HomeComponent,
     CounterComponent,
-    FetchDataComponent
+    FetchDataComponent,
+    MetersComponent,
+    CreateMeterComponent,
+    CreateMeterMappingComponent,
+    MeterMappingComponent,
+    EditMeterMappingComponent,
+
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -24,8 +35,13 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
+      // { path: 'counter', component: CounterComponent },
+      // { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'meters', component: MetersComponent },
+      { path: 'meters/:id', component: MeterMappingComponent },
+      { path: 'meters-edit/:id/:mapping', component: EditMeterMappingComponent },
+      { path: 'create-meter', component: CreateMeterComponent },
+      { path: 'create-meter-mapping/:id', component: CreateMeterMappingComponent  },
     ])
   ],
   providers: [],
