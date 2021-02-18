@@ -141,7 +141,7 @@ namespace DLSMConsoleCore
                     var objectToRead = Console.ReadLine();
                     KeyValuePair<string, int> pair = new KeyValuePair<string, int>("", 0);
                     if (objectToRead == "x")
-                        return;
+                        break;
 
                     if (objectToRead.Contains(":"))
                         pair = new KeyValuePair<string, int>(objectToRead.Split(":")[0], int.Parse(objectToRead.Split(":")[1]));
@@ -156,7 +156,7 @@ namespace DLSMConsoleCore
                         else
                         {
                             var msg = obj.ToString();
-
+                            Log.Logger.Information($"ToString: ${msg}");
                             Log.Logger.Information(reader.PrintObject(obj));
                         }
                     //object val = reader.Read(obj, pair.Value);
