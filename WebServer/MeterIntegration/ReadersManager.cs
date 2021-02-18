@@ -97,7 +97,7 @@ namespace WebServer.MeterIntegration
                 readlist[meter.Id] = mappings
                     .Select(s =>
                     {
-                        var pair = new KeyValuePair<GXDLMSObject, int>(this[meter.Id].InnerClient.Objects.FindByLN(ObjectType.None, s.OBIS_Code), 1);
+                        var pair = new KeyValuePair<GXDLMSObject, int>(this[meter.Id].InnerClient.Objects.FindByLN(ObjectType.None, s.OBIS_Code), s.ValueIndex);
                         return pair;
                     })
                     .ToList();

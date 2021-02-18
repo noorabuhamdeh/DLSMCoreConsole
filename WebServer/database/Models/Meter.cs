@@ -19,5 +19,6 @@ namespace WebServer.database.Models
         public bool UseLogicalNameReferencing { get; set; }
         public int InterfaceType { get; set; }
         public DateTime LastForcedReadTime { get; set; } = DateTime.Now;
+        public bool IsComPortMeter { get; set; }
     }
 }

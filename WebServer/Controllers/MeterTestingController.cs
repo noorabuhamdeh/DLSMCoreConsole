@@ -41,7 +41,10 @@ namespace WebServer.Controllers
                 if (mappings == null)
                     return NotFound("Meter mappings");
 
-                await readersManager.InitializeComPortMeter(meter, port, mappings);
+                var newmeter = await readersManager.InitializeComPortMeter(meter, port, mappings);
+                if (meter.ObjectsXMLDocument != newmeter.ObjectsXMLDocument)
+                    databaseContext.Meters.Update(newmeter);
+
                 return Ok();
             }
             catch (Exception ex)
