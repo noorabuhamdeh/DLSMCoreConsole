@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Gurux.DLMS.Objects;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebServer.database;
+using WebServer.database.Models;
 using WebServer.MeterIntegration;
 
 namespace WebServer.Controllers
@@ -25,7 +27,7 @@ namespace WebServer.Controllers
             databaseContext = _databaseContext;
         }
        
-        [HttpGet]
+        [HttpGet("GetMeterIntialization/{meterId}")]
         public async Task<IActionResult> GetMeterIntialization(int meterId)
         {
             try
@@ -41,15 +43,33 @@ namespace WebServer.Controllers
                 if (mappings == null)
                     return NotFound("Meter mappings");
 
-                var newmeter = await readersManager.InitializeComPortMeter(meter, port, mappings);
-                if (meter.ObjectsXMLDocument != newmeter.ObjectsXMLDocument)
-                    databaseContext.Meters.Update(newmeter);
-
+                if (readersManager.InitializeComPortMeter(meter, port, mappings))
+                {
+                    databaseContext.Meters.Update(meter);
+                    await databaseContext.SaveChangesAsync();
+                }
                 return Ok();
             }
             catch (Exception ex)
             {
-                return Json(ex);
+                return Json(ex.Message);
+            }
+        }
+        [HttpGet("ReadValue/{mappingId}")]
+        public async Task<IActionResult> ReadValue(int  mappingId)
+        {
+            try
+            {
+                var mappingValue = databaseContext.MeterMappings.SingleOrDefault(m => m.Id == mappingId);
+                if (mappingValue == null)
+                    return NotFound("mappingVaulue");
+                var value = readersManager.Read(mappingValue)  as GXDLMSObject;
+                var json = "{" + $"desc:{value.Description},value:{value.GetValues()[mappingValue.ValueIndex]}" + "}";
+                return Json(json);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
             }
         }
     }

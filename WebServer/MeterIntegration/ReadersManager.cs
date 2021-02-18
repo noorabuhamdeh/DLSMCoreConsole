@@ -20,22 +20,13 @@ namespace WebServer.MeterIntegration
     public class ReadersManager
     {
         private readonly ILogger<ReadersManager> logger;
-        private readonly DatabaseContextEF databaseContext;
-        private IList<IDLMSReader> meters;
-        private Dictionary<int, IList<KeyValuePair<GXDLMSObject, int>>> readlist;
+        private IDLMSReader physicalMeter;
+        private IList<KeyValuePair<GXDLMSObject, int>> readlist;
 
         public ReadersManager(ILogger<ReadersManager> logger)
         {
             this.logger = logger;
-            meters = new List<IDLMSReader>();
-            readlist = new Dictionary<int, IList<KeyValuePair<GXDLMSObject, int>>>();
-        }
-        public IDLMSReader this[int meterId]
-        {
-            get
-            {
-                return meters.Where(w => w.Id == meterId).SingleOrDefault();
-            }
+            readlist = new List<KeyValuePair<GXDLMSObject, int>>();
         }
         private IGXMedia CreateComPortMedia(ComPortMedia comPort)
         {
@@ -60,12 +51,17 @@ namespace WebServer.MeterIntegration
         //        throw new InvalidOperationException("something went wrong");
 
         //}
-        public async Task< Meter> InitializeComPortMeter(Meter meter, ComPortMedia comPort, IList<MeterMapping> mappings)
+        public object Read(MeterMapping mapping)
         {
-            await Task.Run(() =>
-            {
-
-
+            physicalMeter.OpenMedia();
+            var obj = physicalMeter.Read(physicalMeter.InnerClient.Objects.FindByLN(ObjectType.None, mapping.OBIS_Code), mapping.ValueIndex);
+            return physicalMeter.InnerClient.Objects.FindByLN(ObjectType.None, mapping.OBIS_Code) as GXDLMSObject;
+        }
+        public  bool InitializeComPortMeter(Meter meter, ComPortMedia comPort, IList<MeterMapping> mappings)
+        {
+            //Task.Run(() =>
+            //{
+            bool result = false;
                 if (meter == null)
                     throw new ArgumentNullException("meter");
                 if (comPort == null)
@@ -75,7 +71,6 @@ namespace WebServer.MeterIntegration
 
                 GXDLMSSecureClient client = new GXDLMSSecureClient(true);
                 IGXMedia media = null;
-                DLMSReader reader = null;
 
                 media = CreateComPortMedia(comPort);
                 client.UseLogicalNameReferencing = meter.UseLogicalNameReferencing;
@@ -85,25 +80,32 @@ namespace WebServer.MeterIntegration
                 client.Password = Encoding.ASCII.GetBytes(meter.Password);
                 client.Authentication = (Authentication)meter.AuthenticationType;
 
-                reader = new DLMSReader(meter.Id, meter.Name,  client, media);
+                physicalMeter = new DLMSReader(meter.Id, meter.Name,  client, media);
 
-                meters.Add(reader);
 
-                if (string.IsNullOrEmpty(meter.ObjectsXMLDocument))
-                    meter.ObjectsXMLDocument = this[meter.Id].GetAssociationViewsXml();
-                else
-                    this[meter.Id].LoadAssociationViewsFromXml(meter.ObjectsXMLDocument);
-
-                readlist[meter.Id] = mappings
-                    .Select(s =>
-                    {
-                        var pair = new KeyValuePair<GXDLMSObject, int>(this[meter.Id].InnerClient.Objects.FindByLN(ObjectType.None, s.OBIS_Code), s.ValueIndex);
-                        return pair;
-                    })
-                    .ToList();
-            });
-
-            return meter;
+            if (string.IsNullOrEmpty(meter.ObjectsXMLDocument))
+            {
+                meter.ObjectsXMLDocument = physicalMeter.GetAssociationViewsXml();
+                result = true;
+            }
+            else
+            {
+                physicalMeter.OpenMedia();
+                physicalMeter.LoadAssociationViewsFromXml(meter.ObjectsXMLDocument);
+                physicalMeter.InitializeConnection();
+            }
+             
+            //readlist = mappings
+            //        .Select(s =>
+            //        {
+            //            var pair = new KeyValuePair<GXDLMSObject, int>(physicalMeter.InnerClient.Objects.FindByLN(ObjectType.None, s.OBIS_Code), s.ValueIndex);
+            //            return pair;
+            //        })
+            //        .ToList();
+                
+            //    return meter;
+            //});
+            return result;
         }
     }
 }

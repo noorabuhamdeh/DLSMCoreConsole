@@ -1381,6 +1381,7 @@ namespace WebServer.MeterIntegration
             {
                 byte[] content = Encoding.UTF8.GetBytes(xml);
                 memoryStream.Write(content, 0, content.Length);
+                memoryStream.Position = 0;
                 Client.Objects.AddRange(GXDLMSObjectCollection.Load(memoryStream));
             }
         }
