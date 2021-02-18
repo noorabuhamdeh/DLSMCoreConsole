@@ -1,0 +1,29 @@
+<p *ngIf="!meters"><em>Loading...</em></p>
+
+<div class="btn btn-primary float-right" (click)="createMeter()">Create New Meter</div>
+
+<h1 id="tableLabel">Meters</h1>
+<table class='table table-hover' aria-labelledby="tableLabel" *ngIf="meters">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Objects Xml</th>
+      <th>Password</th>
+      <th>Physical Server</th>
+      <th>Client Address</th>
+      <th>Manufacture Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let meter of meters">
+      <td>{{ meter.name }}</td>
+      <td>{{ meter.objectsXMLDocument }}</td>
+      <td>{{ meter.password}}</td>
+      <td>{{ meter.physicalServer }}</td>
+      <td>{{ meter.clientAddress }}</td>
+      <td>{{ meter.manufactureName }}</td>
+      <td><div (click)="editMeter(meter.id)" class="btn btn-success">Edit</div> </td>
+    </tr>
+  </tbody>
+</table>

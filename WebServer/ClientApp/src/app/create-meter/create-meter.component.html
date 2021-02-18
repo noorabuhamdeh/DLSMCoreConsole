@@ -1,0 +1,46 @@
+<form #form="ngForm">
+<div class="card gutter-b">
+    <div class="card-header">
+        Create New Meter
+    </div>
+  <div class="card-body">
+    <div class="form-group col-md-6">
+      <label for="inputCity">Name</label>
+      <input type="text" class="form-control" name="physicalServer" [(ngModel)]="meter.name" required />
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputCity">Objects Xml Doc</label>
+      <input type="text" class="form-control" name="physicalServer" [(ngModel)]="meter.objectsXMLDocument" required />
+    </div>
+        <div class="form-group">
+          <label for="inputPassword4">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            name="password"
+            placeholder="Password"
+            required
+            [(ngModel)] ="meter.password"
+          />
+        </div>
+         <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="inputCity">Physical Server</label>
+          <input type="text" class="form-control" name="physicalServer" [(ngModel)]="meter.physicalServer" required />
+        </div>
+        <div class="form-group col-md-6">
+          <label for="inputZip">Client Address</label>
+          <input type="text" class="form-control" name="clientAddress" [(ngModel)]="meter.clientAddress" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputState">Manufacturer</label>
+          <input type="text" class="form-control" name="clientAddress" [(ngModel)]="meter.manufactureName" required/>
+      </div>
+    </div>
+    <div class="card-footer">
+        <button (click)="cancel()" class="btn btn-danger">Cancel</button>
+        <button (click)="submit()" class="btn btn-primary float-right">Save</button>
+    </div>
+</div>
+</form>

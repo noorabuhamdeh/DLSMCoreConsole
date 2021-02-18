@@ -170,3 +170,8 @@ pip-log.txt
 *.ide-wal
 *.ide-shm
 Development/.vs/Gurux.Common/DesignTimeBuild/.dtbcache
+/WebServer/database/IndustrialMeter.db
+/WebServer/database/IndustrialMeter.db-shm
+/WebServer/database/IndustrialMeter.db-wal
+/WebServer/database/Migrations
+/WebServer/Logs
